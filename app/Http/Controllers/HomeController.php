@@ -84,7 +84,6 @@ class HomeController extends Controller
 
     public function logout($id)
     {
-        //dd($this->request->input('id'));
         $user            = $this->user->find($id);
         $user->is_active = 0;
         $user->save();
