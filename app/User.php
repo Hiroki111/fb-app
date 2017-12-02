@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class User extends Model
 {
-    use Notifiable;
+    //use Notifiable;
     /**
      * The attributes that are mass assignable.
      *
@@ -14,7 +14,7 @@ class User extends Model
      */
     protected $table    = 'users';
     protected $fillable = [
-        'name', 'email', 'access_token', 'is_active',
+        'fb_id', 'name', 'email', 'access_token', 'is_active',
     ];
 
     /**
