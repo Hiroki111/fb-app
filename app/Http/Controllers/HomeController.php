@@ -87,7 +87,7 @@ class HomeController extends Controller
         $user            = $this->user->find($id);
         $user->is_active = 0;
         $user->save();
-
+        $this->fb->delete('/me/permissions', ['access_token' => $user->access_token]);
         return redirect('/')->withCookie(Cookie::forget('fb_access_token'));
     }
 }
