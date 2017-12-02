@@ -11,6 +11,7 @@
 |
  */
 
-Route::get('/', function () {
-    return view('index');
-});
+Route::get('/', 'HomeController@index');
+Route::get('/login', 'HomeController@login');
+Route::get('/success', 'HomeController@loginSuccess');
+Route::get('/logout/{id}', 'HomeController@logout');
