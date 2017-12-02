@@ -16,12 +16,12 @@ class HomeController extends Controller
      *
      * @return void
      */
-    public function __construct(Request $request, Client $client, User $user)
+    public function __construct(Request $request, Client $restClient, User $user)
     {
-        $this->request = $request;
-        $this->client  = $client;
-        $this->user    = $user;
-        $this->fb      = new Facebook([
+        $this->request    = $request;
+        $this->restClient = $restClient;
+        $this->user       = $user;
+        $this->fb         = new Facebook([
             'app_id'                => env('FACEBOOK_APP_ID'),
             'app_secret'            => env('FACEBOOK_APP_SECRET'),
             'default_graph_version' => env('FACEBOOK_DEFAULT_GRAPH_VERSION'),
@@ -35,14 +35,14 @@ class HomeController extends Controller
         }
 
         $url    = "https://graph.facebook.com/me?access_token=" . $this->request->cookie('fb_access_token');
-        $result = $this->client->request('GET', $url);
+        $result = $this->restClient->request('GET', $url);
         $user   = $this->user
             ->where('is_active', 1)
             ->where('access_token', $this->request->cookie('fb_access_token'))
             ->first();
 
         if ($result->getStatusCode() === 200 && !empty($user)) {
-            $response = $this->fb->get('/me?fields=picture.width(300)', $this->request->cookie('fb_access_token'));
+            $response = $this->fb->get('/me?fields=picture.width(300)', $user->access_token);
 
             return view('index', [
                 'id'      => $user->id,
@@ -62,11 +62,11 @@ class HomeController extends Controller
     public function loginSuccess()
     {
         $urlForToken    = "https://graph.facebook.com/v2.11/oauth/access_token?client_id=" . env('FACEBOOK_APP_ID') . "&redirect_uri=" . env('APP_URL') . "success&client_secret=" . env('FACEBOOK_APP_SECRET') . "&code=" . $this->request->input('code');
-        $resultForToken = $this->client->request('GET', $urlForToken);
+        $resultForToken = $this->restClient->request('GET', $urlForToken);
         $accessToken    = json_decode($resultForToken->getBody()->getContents())->access_token;
 
         $urlForUser    = "https://graph.facebook.com/me?access_token=" . $accessToken;
-        $resultForUser = $this->client->request('GET', $urlForUser);
+        $resultForUser = $this->restClient->request('GET', $urlForUser);
         $userInfo      = json_decode($resultForUser->getBody()->getContents());
 
         $user = $this->user->firstOrCreate([
