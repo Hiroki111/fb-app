@@ -61,9 +61,13 @@ class HomeController extends Controller
 
     public function loginSuccess()
     {
-        $urlForToken    = "https://graph.facebook.com/v2.11/oauth/access_token?client_id=" . env('FACEBOOK_APP_ID') . "&redirect_uri=" . env('APP_URL') . "success&client_secret=" . env('FACEBOOK_APP_SECRET') . "&code=" . $this->request->input('code');
-        $resultForToken = $this->restClient->request('GET', $urlForToken);
-        $accessToken    = json_decode($resultForToken->getBody()->getContents())->access_token;
+        $urlShortToken    = "https://graph.facebook.com/v2.11/oauth/access_token?client_id=" . env('FACEBOOK_APP_ID') . "&redirect_uri=" . env('APP_URL') . "success&client_secret=" . env('FACEBOOK_APP_SECRET') . "&code=" . $this->request->input('code');
+        $resultShortToken = $this->restClient->request('GET', $urlShortToken);
+        $shortAccessToken = json_decode($resultShortToken->getBody()->getContents())->access_token;
+
+        $urlToken    = "https://graph.facebook.com/v2.11/oauth/access_token?grant_type=fb_exchange_token&client_id=" . env('FACEBOOK_APP_ID') . "&client_secret=" . env('FACEBOOK_APP_SECRET') . "&fb_exchange_token=" . $shortAccessToken;
+        $resultToken = $this->restClient->request('GET', $urlToken);
+        $accessToken = json_decode($resultToken->getBody()->getContents())->access_token;
 
         $urlForUser    = "https://graph.facebook.com/me?access_token=" . $accessToken;
         $resultForUser = $this->restClient->request('GET', $urlForUser);
